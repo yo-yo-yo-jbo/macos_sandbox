@@ -7,6 +7,6 @@ The first time I learned about the macOS sandbox I naively tried to create a mal
 This (still) is a very common entry vector in the Windows ecosystem, so I wanted to see if I could just launch processes and generally wreck havoc.  
 Well, things are not so easy on macOS - I was able to run processes, for instance, but it seems they couldn't do much.  
 Dropping files always got me cryptic access denied error - what's going on?  
-I started reading a bit about macOS and Word and came upon [this excellent blogpost](https://www.mdsec.co.uk/2018/08/escaping-the-sandbox-microsoft-office-on-macos/) by [@_xpn_](https://twitter.com/_xpn_) from MDSec. I highly recommend reading the blogpost, but I'll summarize the findings here:
+I started reading a bit about macOS and Word and came upon [this excellent blogpost](https://www.mdsec.co.uk/2018/08/escaping-the-sandbox-microsoft-office-on-macos/) by [Adam Chester](https://twitter.com/_xpn_) (works at MDSec). I highly recommend reading the blogpost, but I'll summarize the findings here:
 - Apps may use a technology called [the App Sandbox](https://developer.apple.com/documentation/security/app_sandbox).
 - Once set up, the OS enforces *configurable rules* on the App, such as what filenames it could create, whether it can use network capabilities and so on.
