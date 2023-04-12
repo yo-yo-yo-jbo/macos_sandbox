@@ -61,6 +61,16 @@ Internal requirements count=1 size=180
 	[Value]
 		[Array]
 			[String] com.ThomsonResearchSoft.EndNote
+			
+...
 ```
 
-This is a lot to unpack.
+This is a lot to unpack, so let's take some high-level notes:
+- First, our command-line used `-dv` flag, which stands for `display` and `verbose`. Then, `--entitlements` presents *entitlements* associated with the App or binary (yes, `codesign` can work on both). We will dive into entitlements in a different blogpost, but for now let's say they reflect capabilities of the App, and one of them states that the App is sandboxed (`com.apple.security.app-sandbox` has a Boolean value of `True`).
+- The first few lines of output are general information about the binary, its hash and many other interesting things. They're out-of-scope for the purpose of this blogpost, but are quite interesting!
+- Next we get a big dictionary. Those of you who remember me ranting about `plists` (again, in my [macOS App Structure blogpost]) might suspect that the key-value dictionary is a representation of some property list, and they will be correct.
+- The sandbox rules are states in some of the dictionary keys. For example, `com.apple.security.temporary-exception.files.absolute-path.read-only` mention an array of absolute paths the App is permitted to read from.
+- The (in)famous regular expression that lives under `com.apple.security.temporary-exception.sbpl` is also here - that's to create those notorious `~$whatever.docx` temporary files that Word is so fond of.
+Note how powerful those sandbox rules are!
+
+In MDSec's blogpost from 2018 that I mentioned earlier, the `deny file-write*` part under `com.apple.security.temporary-exception.sbpl` did not exist, which allowed macros to create files with arbitrary contents such as `/Library/LaunchAgents/~$evil.plist`.
