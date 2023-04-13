@@ -111,6 +111,7 @@ As it turns out, that quarantine attribute is some hardening against certain att
 ## Summary
 We've briefly discussed another macOS technology - the sandbox. We've seen how powerful and configurable it is, and how it could get broken.  
 We've also tied some things together - how apps work with sandbox rules, how `launchd` launching apps breaks more than just the process trees and how `plist` files can be used for good or for evil - this time with persistence (`LaunchAgents` and `LaunchDaemons`).  
+Luckily, we've even tied the `com.apple.quarantine` extended attribute from the [introduction to Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/) blogpost and explained how it might be used as an extra hardening against sandbox escapes. Not too bad!  
 In the next couple of blogposts, we will explore more security mechanisms in macOS and might talk about strategies of breaking them.
 
 Stay tuned!
