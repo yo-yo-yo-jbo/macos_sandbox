@@ -102,3 +102,17 @@ Saving you a couple of clicks - here's the idea:
 
 There have been similar ideas in other disclosures (one nice example lives [here](https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c)) but the idea stays the same. I am pretty sure there are plenty more in plain sight!
 
+## The fixes and the quarantine xattr
+The one issue found by MDSec was specific to Office - and was fixed with more strict rules.  
+The ones abusing `LaunchServices` (which is the framework name for launching apps with `launchd`) are more generic - and hence Apple had to fix them.  
+One of the things I've noticed was files dropped by Word are now created with the `com.apple.quarantine` extended attribute, yes the same one I mentioned in my [introduction to Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/) blogpost.  
+As it turns out, that quarantine attribute is some hardening against certain attacks - for example, the `Terminal` App refused to launch shell scripts created with that attribute. That's the reason, by the way, I had to use the `--stdin` option for `Python`.
+
+## Summary
+We've briefly discussed another macOS technology - the sandbox. We've seen how powerful and configurable it is, and how it could get broken.  
+We've also tied some things together - how apps work with sandbox rules, how `launchd` launching apps breaks more than just the process trees and how `plist` files can be used for good or for evil - this time with persistence (`LaunchAgents` and `LaunchDaemons`).  
+In the next couple of blogposts, we will explore more security mechanisms in macOS and might talk about strategies of breaking them.
+
+Stay tuned!
+
+Jonathan Bar Or
