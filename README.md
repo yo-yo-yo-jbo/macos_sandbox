@@ -71,6 +71,25 @@ This is a lot to unpack, so let's take some high-level notes:
 - Next we get a big dictionary. Those of you who remember me ranting about `plists` (again, in my [macOS App Structure blogpost]) might suspect that the key-value dictionary is a representation of some property list, and they will be correct.
 - The sandbox rules are states in some of the dictionary keys. For example, `com.apple.security.temporary-exception.files.absolute-path.read-only` mention an array of absolute paths the App is permitted to read from.
 - The (in)famous regular expression that lives under `com.apple.security.temporary-exception.sbpl` is also here - that's to create those notorious `~$whatever.docx` temporary files that Word is so fond of.
+- Of course, it goes without saying that creating new child processes inherit the sandbox rules, otherwise there is no much point to it.
 Note how powerful those sandbox rules are!
 
-In MDSec's blogpost from 2018 that I mentioned earlier, the `deny file-write*` part under `com.apple.security.temporary-exception.sbpl` did not exist, which allowed macros to create files with arbitrary contents such as `/Library/LaunchAgents/~$evil.plist`.
+## Sandbox escape via LaunchAgents
+In MDSec's blogpost from 2018 that I mentioned earlier, the `deny file-write*` part under `com.apple.security.temporary-exception.sbpl` did not exist, which allowed macros to create files with arbitrary contents such as `/Library/LaunchAgents/~$evil.plist`. Why does that escape the sandbox?  
+`LaunchAgents` and `LaunchDaemons` are a well known (legitimate) persistence mechanism in macOS. I've mentioned them before, but you can think of them as Services (if you come from the Windows world) - `LaunchDaemons` start when the OS boots (and therefore live outside of a user's session), while `LaunchAgents` start when a user logs in.  
+Interestingly, both are described in simple `plist` files. Here's one example for my OneDrive updater:
+```shell
+jbo@McJbo ~ % plutil -p /Library/LaunchAgents/com.microsoft.OneDriveStandaloneUpdater.plist
+{
+  "Label" => "com.microsoft.OneDriveStandaloneUpdater"
+  "Program" => "/Applications/OneDrive.app/Contents/StandaloneUpdater.app/Contents/MacOS/OneDriveStandaloneUpdater"
+  "ProgramArguments" => [
+  ]
+  "RunAtLoad" => 1
+  "StartInterval" => 86400
+}
+```
+
+Those LaunchAgents and LaunchDaemons get launched by `launchd` (remember that process?) and therefore it escapes the sandbox, as `launchd` had no knowledge of whether the `plist` was dropped from a sandboxed process or not (and even if it did - how would it know what sandbox rules to apply?).
+
+This concept of using `launchd` to escape the macOS sandbox was used extensively, and in fact, [I have used that](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) in the past.
