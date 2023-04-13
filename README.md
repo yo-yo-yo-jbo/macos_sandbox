@@ -74,7 +74,7 @@ This is a lot to unpack, so let's take some high-level notes:
 - Of course, it goes without saying that creating new child processes inherit the sandbox rules, otherwise there is no much point to it.
 Note how powerful those sandbox rules are!
 
-## Sandbox escape via LaunchAgents
+## Sandbox escape with launchd
 In MDSec's blogpost from 2018 that I mentioned earlier, the `deny file-write*` part under `com.apple.security.temporary-exception.sbpl` did not exist, which allowed macros to create files with arbitrary contents such as `/Library/LaunchAgents/~$evil.plist`. Why does that escape the sandbox?  
 `LaunchAgents` and `LaunchDaemons` are a well known (legitimate) persistence mechanism in macOS. I've mentioned them before, but you can think of them as Services (if you come from the Windows world) - `LaunchDaemons` start when the OS boots (and therefore live outside of a user's session), while `LaunchAgents` start when a user logs in.  
 Interestingly, both are described in simple `plist` files. Here's one example for my OneDrive updater:
@@ -92,4 +92,13 @@ jbo@McJbo ~ % plutil -p /Library/LaunchAgents/com.microsoft.OneDriveStandaloneUp
 
 Those LaunchAgents and LaunchDaemons get launched by `launchd` (remember that process?) and therefore it escapes the sandbox, as `launchd` had no knowledge of whether the `plist` was dropped from a sandboxed process or not (and even if it did - how would it know what sandbox rules to apply?).
 
-This concept of using `launchd` to escape the macOS sandbox was used extensively, and in fact, [I have used that](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) in the past.
+This concept of using `launchd` to escape the macOS sandbox was used extensively, and in fact, [I have used that](https://www.microsoft.com/en-us/security/blog/2022/07/13/uncovering-a-macos-app-sandbox-escape-vulnerability-a-deep-dive-into-cve-2022-26706/) in the past.  
+Saving you a couple of clicks - here's the idea:
+- As you might recall, `launchd` launches macOS Apps. Those Apps might be launched by double-clicking them, or by other means - for example, clicking on a `zip` file will use the `Archive Utility` since it's associated to `zip` files.
+- An alternative way to launch Apps through `launchd` is with the `open` command.
+- The `open` command is rich - you can use some of its interesting features such as selecting the App, selecting the filename to open or even give full command-line arguments.
+- I specifically used the builtin `Python` App (which no longer exists on new macOS vanilla devices) to launch Python with an `stdin` argument that essentially redirects the standard input from a file I dropped (that file was `~$evil.py` due to Word's constaints).
+- In our case, `launchd` ran an unsandboxed `Python` App instance which started reading from `~$evil.py` which had arbitrary Python commands, essentially escaping the sandbox.
+
+There have been similar ideas in other disclosures (one nice example lives [here](https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c)) but the idea stays the same. I am pretty sure there are plenty more in plain sight!
+
