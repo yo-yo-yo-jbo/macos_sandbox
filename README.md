@@ -106,7 +106,7 @@ There have been similar ideas in other disclosures (one nice example lives [here
 The one issue found by MDSec was specific to Office - and was fixed with more strict rules.  
 The ones abusing `LaunchServices` (which is the framework name for launching apps with `launchd`) are more generic - and hence Apple had to fix them.  
 One of the things I've noticed was files dropped by Word are now created with the `com.apple.quarantine` extended attribute, yes the same one I mentioned in my [introduction to Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/) blogpost.  
-As it turns out, that quarantine attribute is some hardening against certain attacks - for example, the `Terminal` App refused to launch shell scripts created with that attribute. That's the reason, by the way, I had to use the `--stdin` option for `Python`.
+As it turns out, that quarantine attribute is some hardening against certain attacks - for example, the `Terminal` App refused to launch shell scripts created with that attribute. That's the reason, by the way, that I had to use the `--stdin` option for `Python`.
 
 ## Summary
 We've briefly discussed another macOS technology - the sandbox. We've seen how powerful and configurable it is, and how it could get broken.  
