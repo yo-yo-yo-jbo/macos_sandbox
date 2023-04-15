@@ -100,8 +100,8 @@ Saving you a couple of clicks - here's the idea:
 - I specifically used the builtin `Python` App (which no longer exists on new macOS vanilla devices) to launch Python with an `stdin` argument that essentially redirects the standard input from a file I dropped (that file was `~$evil.py` due to Word's constaints).
 - In our case, `launchd` ran an unsandboxed `Python` App instance which started reading from `~$evil.py` which had arbitrary Python commands, essentially escaping the sandbox.
 
-There have been similar ideas in other disclosures (one nice example lives [here](https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c)) but the idea stays the same. I am pretty sure there are plenty more in plain sight!
-One of them is well-described in a [great blogpost](https://wojciechregula.blog/post/macos-sandbox-escape-via-terminal/) by [Wojciech Regula](https://twitter.com/_r3ggi) - this time focusing on the `Terminal` app and an environment variable manipulation.
+There have been similar ideas in other disclosures (one nice example lives [here](https://desi-jarvis.medium.com/office365-macos-sandbox-escape-fcce4fa4123c)) but the idea stays the same. I am pretty sure there are plenty more in plain sight!  
+One honorable mention goes to a [great blogpost](https://wojciechregula.blog/post/macos-sandbox-escape-via-terminal/) by [Wojciech Regula](https://twitter.com/_r3ggi) - this time focusing on the `Terminal` app and an environment variable manipulation. You should give it a read!
 
 ## The fixes and the quarantine xattr
 The one issue found by MDSec was specific to Office - and was fixed with more strict rules.  
