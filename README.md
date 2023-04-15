@@ -108,6 +108,10 @@ The ones abusing `LaunchServices` (which is the framework name for launching app
 One of the things I've noticed was files dropped by Word are now created with the `com.apple.quarantine` extended attribute, yes the same one I mentioned in my [introduction to Gatekeeper](https://github.com/yo-yo-yo-jbo/macos_gatekeeper/) blogpost.  
 As it turns out, that quarantine attribute is some hardening against certain attacks - for example, the `Terminal` App refused to launch shell scripts created with that attribute. That's the reason, by the way, that I had to use the `--stdin` option for `Python`.
 
+## More fixes
+As pointed out by [Gergely Kalman](https://twitter.com/gergely_kalman) - Apple has added further checks to the `open` binary to harden those kind of exploits. It seems that `--stdin`, `--args` and other command-line flags are ignored if the calling process is sandboxed. However, `open` simply calls `LaunchServices` (in `launchd`) with an IPC, and conveniently there are APIs for that, e.g. [LSOpenURLsWithRole](https://developer.apple.com/documentation/coreservices/1448184-lsopenurlswithrole).  
+I have no investigated whether `LaunchServices` itself is hardened too - if not, then I believe similar sandbox escapes could be easily achieved.
+
 ## Summary
 We've briefly discussed another macOS technology - the sandbox. We've seen how powerful and configurable it is, and how it could get broken.  
 We've also tied some things together - how apps work with sandbox rules, how `launchd` launching apps breaks more than just the process trees and how `plist` files can be used for good or for evil - this time with persistence (`LaunchAgents` and `LaunchDaemons`).  
